@@ -46,6 +46,16 @@ function clock:create()
         clock:insert(hours)
     end
 
+    local function clampRotation(degrees)
+        if (degrees == 0) then
+            return 360
+        end
+        if (degrees >= 360) then
+            return degrees - (math.floor(degrees / 360) * 360)
+        end
+        return degrees
+    end
+
     local function hand(steps, delay, hand_length, color)
 
         local the_hand = display.newGroup()
@@ -59,23 +69,20 @@ function clock:create()
 
         the_hand.set = function(value, animate)
             if (animate) then
-                local rotation = value * the_hand.step_sz
-                if (rotation == 0) then
-                    rotation = 360
+                local new_rotation = clampRotation(value * the_hand.step_sz)
+                local function trim()
+                    the_hand.rotation = clampRotation(the_hand.rotation)
                 end
-                local function trimRotation()
-                    if (the_hand.rotation >= 360) then
-                        the_hand.rotation = the_hand.rotation - 360
-                    end
-                end
+                print(value * the_hand.step_sz)
+                print(new_rotation)
                 transition.to(the_hand, {
-                    rotation = rotation,
+                    rotation = new_rotation,
                     time = anim_time,
                     transition = easing.outElastic,
-                    onComplete = trimRotation
+                    onComplete = trim
                 })
             else
-                the_hand.rotation = value * the_hand.step_sz
+                the_hand.rotation = clampRotation(value * the_hand.step_sz)
             end
         end
         return the_hand
