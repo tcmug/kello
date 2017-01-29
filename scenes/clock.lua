@@ -55,7 +55,6 @@ function scene:enterFrame()
     self.previous = time_now
     self.accumulated = self.accumulated + delta
     while (self.accumulated >= 1000) do
-        print(self.accumulated)
         self.top.step()
         self.clock:step(true)
         self.bottom.step()
