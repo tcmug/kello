@@ -1,12 +1,14 @@
 
 -- The clock face.
 
+local hand = require( "objects.hand" )
+
 clock = {}
 
 function clock:create()
 
     local clock = display.newGroup()
-    local clock_size = 150
+    local clock_size = 145
 
     local circle = display.newCircle(320, 570, clock_size, clock_size)
     circle.x = 0
@@ -46,77 +48,39 @@ function clock:create()
         clock:insert(hours)
     end
 
-    local function clampRotation(degrees)
-        if (degrees == 0) then
-            return 360
-        end
-        if (degrees >= 360) then
-            return degrees - (math.floor(degrees / 360) * 360)
-        end
-        return degrees
-    end
-
-    local function hand(steps, delay, hand_length, color)
-
-        local the_hand = display.newGroup()
-
-        local line = display.newRect(0, -hand_length / 2, 3, hand_length)
-        line:setFillColor(color[1], color[2], color[3])
-        the_hand:insert(line)
-        the_hand.step_sz = (360 / steps)
-        the_hand.steps = steps
-        the_hand.rotation = 0
-
-        the_hand.set = function(value, animate)
-            if (animate) then
-                local new_rotation = clampRotation(value * the_hand.step_sz)
-                local function trim()
-                    the_hand.rotation = clampRotation(the_hand.rotation)
-                end
-                print(value * the_hand.step_sz)
-                print(new_rotation)
-                transition.to(the_hand, {
-                    rotation = new_rotation,
-                    time = anim_time,
-                    transition = easing.outElastic,
-                    onComplete = trim
-                })
-            else
-                the_hand.rotation = clampRotation(value * the_hand.step_sz)
-            end
-        end
-        return the_hand
-    end
-
-    local th = os.date("%I"):match("0*(%d+)")
-    local tm = os.date("%M"):match("0*(%d+)")
-    local ts = os.date("%S"):match("0*(%d+)")
-
-    clock.hour   = hand(12 * 60 * 60, 60 * 60, clock_size - 55, {1,1,1})
-    clock.minute = hand(60 * 60, 60, clock_size - 25, {1,1,1})
-    clock.second = hand(60, 1, clock_size - 20, {1,0,0})
-    clock.second.set(ts)
-
+    clock.hour = hand:create("hand.png", 100, 12 * 60 * 60)
     clock:insert(clock.hour)
+
+    clock.minute = hand:create("hand.png", 120, 60 * 60)
     clock:insert(clock.minute)
+
+    clock.second = hand:create("sec_hand.png", 130, 60)
     clock:insert(clock.second)
 
-    local circle = display.newCircle(0, 0, 5, 5)
-    circle.strokeWidth = 5
+    local circle = display.newCircle(0, 0, 10, 10)
+    circle.x = 0
+    circle.y = 0
+    circle:setFillColor( 0, 0, 0 )
+    circle.strokeWidth = 4
     circle:setStrokeColor( 1, 1, 1 )
     clock:insert(circle)
+    local anim_time = 300
 
-    function clock:step(animate)
-        local th = tonumber(os.date("%I"):match("0*(%d+)"))
-        local tm = tonumber(os.date("%M"):match("0*(%d+)"))
-        local ts = tonumber(os.date("%S"):match("0*(%d+)"))
-
-        self.hour.set(th * 60 * 60 + (tm * 60), animate)
-        self.minute.set(tm * 60 + ts, animate)
-        self.second.set(ts, animate)
+    function clock:step()
+        local h, m, s = self:getTime()
+        self.hour:set(h * 60 * 60 + (m * 60), true)
+        self.minute:set(m * 60 + s, true)
+        self.second:set(s, true)
     end
 
-    clock:step(false)
+    function clock:getTime()
+        return tonumber(os.date("%H"):match("0*(%d+)")),
+            tonumber(os.date("%M"):match("0*(%d+)")),
+            tonumber(os.date("%S"):match("0*(%d+)"))
+
+    end
+
+    clock:step();
 
     return clock
 
