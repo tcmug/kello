@@ -10,28 +10,36 @@ function scene:create( event )
 
     local sceneGroup = self.view
 
-    -- self.wheel = display.newImageRect("dn.png", 1200, 1200)
-    -- self.wheel.y = display.contentHeight
-    -- self.wheel.x = display.contentCenterX
-    -- sceneGroup:insert(self.wheel)
+    -- background
 
-    local sun = display.newImageRect("sun.png", 64, 64)
+    local sky = display.newRect(display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
+    sky:setFillColor( 0, 0, 0.5 )
+    sceneGroup:insert(sky)
+    self.sky = sky
+
+    local sun = display.newImageRect("sun.png", 40, 40)
     sceneGroup:insert(sun)
+    sun.x, sun.y = display.contentCenterX, display.contentCenterY
     self.sun = sun
 
-
-    local moon = display.newImageRect("moon.png", 64, 64)
+    local moon = display.newImageRect("moon.png", 40, 40)
+    moon.x, moon.y = display.contentCenterX, display.contentCenterY
     sceneGroup:insert(moon)
     self.moon = moon
 
+    local ground = display.newRect(display.contentCenterX, display.contentCenterY + display.actualContentHeight / 2, display.actualContentWidth, display.actualContentHeight)
+    ground:setFillColor( 0, 0.2, 0 )
+    sceneGroup:insert(ground)
+    self.ground = ground
 
-    -- local sun = display.newImageRect("moon.png", 128, 128)
-    -- sun.y = display.contentHeight
-    -- sun.x = display.contentCenterX
-    -- sceneGroup:insert(sun)
-    -- self.sun = sun
+    -- local div = display.newRect(display.contentCenterX, display.contentCenterY, display.actualContentWidth, 3)
+    -- div:setFillColor( 0.5, 0.5, 0.5 )
+    -- sceneGroup:insert(div)
+    -- self.div = div
 
-    self.clock = clock:create()
+    -- clock
+
+    self.clock = clock:create(110)
     sceneGroup:insert(self.clock)
     self.clock.x, self.clock.y = display.contentCenterX, display.contentCenterY
 
@@ -60,7 +68,7 @@ function scene:create( event )
     transition.to(self.bottom, {
         y = display.contentHeight - 30,
         time = 800,
-        transition = easing.inOutCubic
+        easing = easing.inOutCubic
     })
 
     self.accumulated = 0
@@ -90,12 +98,28 @@ function scene:enterFrame()
         -- 6 - 18
         -- 18 - 24, 0 - 6
         local moon = ((math.pi * 2) / 24) * (h + (m / 60))
-        self.moon.x = self.clock.x + (math.sin(moon) * (170))
-        self.moon.y = self.clock.y + (math.cos(moon) * -(170))
+        transition.to(self.moon, {
+            x = self.clock.x + (math.sin(moon) * (140)),
+            y = self.clock.y + (math.cos(moon) * -(155)),
+            time = 800,
+            transition = easing.inOutCubic
+        })
 
         local sun = ((math.pi * 2) / 24) * (h + (m / 60)) + math.pi
-        self.sun.x = self.clock.x + (math.sin(sun) * (170))
-        self.sun.y = self.clock.y + (math.cos(sun) * -(170))
+        transition.to(self.sun, {
+            x = self.clock.x + (math.sin(sun) * (140)),
+            y = self.clock.y + (math.cos(sun) * -(155)),
+            time = 800,
+            transition = easing.inOutCubic
+        })
+
+        local c = math.cos(sun)
+        if (c < 0) then
+            c = 0
+        end
+
+        self.sky:setFillColor(0, 0, c * 0.7 + 0.1)
+        self.ground:setFillColor(0, c * 0.5 + 0.1, 0)
 
         self.accumulated = self.accumulated - 1000
 
