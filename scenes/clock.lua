@@ -3,6 +3,8 @@ local composer = require( "composer" )
 local clock = require( "objects.clock" )
 local top = require( "objects.top" )
 local bottom = require( "objects.bottom" )
+local sun = require( "objects.sun" )
+local moon = require( "objects.moon" )
 local scene = composer.newScene()
 
 -- create()
@@ -12,18 +14,31 @@ function scene:create( event )
 
     -- background
 
-    local sky = display.newRect(display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
-    sky:setFillColor( 0, 0, 0.5 )
+    local sky = display.newImageRect("sky-morning.png", display.actualContentWidth, display.actualContentHeight / 2)
+    sky.x, sky.y = display.contentCenterX, (display.contentCenterY - (display.actualContentHeight / 4))
     sceneGroup:insert(sky)
-    self.sky = sky
+    self.sky_morning = sky
 
-    local sun = display.newImageRect("sun.png", 40, 40)
+    sky = display.newImageRect("sky-day.png", display.actualContentWidth, display.actualContentHeight / 2)
+    sky.x, sky.y = display.contentCenterX, (display.contentCenterY - (display.actualContentHeight / 4))
+    sceneGroup:insert(sky)
+    self.sky_day = sky
+
+    sky = display.newImageRect("sky-evening.png", display.actualContentWidth, display.actualContentHeight / 2)
+    sky.x, sky.y = display.contentCenterX, (display.contentCenterY - (display.actualContentHeight / 4))
+    sceneGroup:insert(sky)
+    self.sky_evening = sky
+
+    sky = display.newImageRect("sky-night.png", display.actualContentWidth, display.actualContentHeight / 2)
+    sky.x, sky.y = display.contentCenterX, (display.contentCenterY - (display.actualContentHeight / 4))
+    sceneGroup:insert(sky)
+    self.sky_night = sky
+
+    local sun = sun:create()
     sceneGroup:insert(sun)
-    sun.x, sun.y = display.contentCenterX, display.contentCenterY
     self.sun = sun
 
-    local moon = display.newImageRect("moon.png", 40, 40)
-    moon.x, moon.y = display.contentCenterX, display.contentCenterY
+    local moon = moon:create()
     sceneGroup:insert(moon)
     self.moon = moon
 
@@ -31,11 +46,6 @@ function scene:create( event )
     ground:setFillColor( 0, 0.2, 0 )
     sceneGroup:insert(ground)
     self.ground = ground
-
-    -- local div = display.newRect(display.contentCenterX, display.contentCenterY, display.actualContentWidth, 3)
-    -- div:setFillColor( 0.5, 0.5, 0.5 )
-    -- sceneGroup:insert(div)
-    -- self.div = div
 
     -- clock
 
@@ -113,12 +123,23 @@ function scene:enterFrame()
             transition = easing.inOutCubic
         })
 
+        local sky_ma = math.max(0, math.sin(sun))
+        local sky_da = math.max(0, math.cos(sun))
+        local sky_ea = math.max(0, -math.sin(sun))
+        local sky_na = math.max(0, -math.cos(sun))
+
+        --print(math.sin(sun), sky_ma, sky_da, sky_ea, sky_na)
+        self.sky_morning.alpha = sky_ma
+        self.sky_day.alpha = sky_da
+        self.sky_evening.alpha = sky_ea
+        self.sky_night.alpha = sky_na
+
         local c = math.cos(sun)
         if (c < 0) then
             c = 0
         end
 
-        self.sky:setFillColor(0, 0, c * 0.7 + 0.1)
+        -- self.sky:setFillColor(0, 0, c * 0.7 + 0.1)
         self.ground:setFillColor(0, c * 0.5 + 0.1, 0)
 
         self.accumulated = self.accumulated - 1000

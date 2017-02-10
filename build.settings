@@ -57,7 +57,13 @@ settings =
 
 	excludeFiles =
 	{
-		all = { "icon.xcf", "README.md", "icon.png", "playstore.xcf", "playstore.png" },
+		all = {
+			"icon.xcf",
+			"README.md",
+			"icon.png",
+			"playstore.xcf",
+			"playstore.png"
+		},
 	}
 
 }
