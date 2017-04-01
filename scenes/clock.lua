@@ -3,13 +3,19 @@ local composer = require( "composer" )
 local clock = require( "objects.clock" )
 local top = require( "objects.top" )
 local bottom = require( "objects.bottom" )
+local sun = require( "objects.sun" )
+local moon = require( "objects.moon" )
+local widget = require( "widget" )
+local config = require( "misc.configuration" )
+local debounce = require( "misc.debounce")
+local tabs = require( "misc.tabs")
+
 local scene = composer.newScene()
 
 -- create()
 function scene:create( event )
 
     local sceneGroup = self.view
-
     -- background
 
     local sky = display.newRect(display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
@@ -60,7 +66,7 @@ function scene:create( event )
     -- bottom
 
     self.bottom = bottom:create()
-    sceneGroup:insert(self.top)
+    sceneGroup:insert(self.bottom)
 
     self.bottom.x = display.contentCenterX
     self.bottom.y = display.contentHeight + 70
@@ -74,6 +80,26 @@ function scene:create( event )
     self.accumulated = 0
     self.previous = system.getTimer()
 
+
+    local t = tabs:new({
+        count = 2,
+        tabs = {
+            "scenes.clock",
+            "scenes.settings",
+        }
+    })
+
+    t.x = display.contentCenterX
+    t.y = display.actualContentHeight - 50
+
+    -- Runtime listeners
+    Runtime:addEventListener( "enterFrame", self )
+end
+
+
+function scene:destroy()
+    print("destroyed")
+    Runtime:removeEventListener( "enterFrame", self )
 end
 
 -- enterFrame() system callback
@@ -87,7 +113,6 @@ function scene:enterFrame()
     self.accumulated = self.accumulated + delta
 
     while (self.accumulated >= 1000) do
-
         self.top.step()
         self.clock:step(true)
         self.bottom.step()
@@ -126,10 +151,44 @@ function scene:enterFrame()
     end
 end
 
--- Scene listeners
-scene:addEventListener( "create", scene )
 
--- Runtime listeners
-Runtime:addEventListener( "enterFrame", scene )
+-- hide()
+function scene:show( event )
+
+    local sceneGroup = self.view
+    local phase = event.phase
+
+    if ( phase == "will" ) then
+
+
+        local sheet = graphics.newImageSheet("selector.png", {
+            width = 32,
+            height = 32,
+            numFrames = 4
+        })
+
+        self.clock.second:set_sprite(
+            sheet,
+            config:get("arm.second", 1)
+        )
+
+        self.clock.minute:set_sprite(
+            sheet,
+            config:get("arm.minute", 1)
+        )
+
+        self.clock.hour:set_sprite(
+            sheet,
+            config:get("arm.hour", 1)
+        )
+
+    elseif ( phase == "did" ) then
+
+    end
+end
+
+scene:addEventListener( "show", scene )
+scene:addEventListener( "create", scene )
+scene:addEventListener( "destroy", scene )
 
 return scene

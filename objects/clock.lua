@@ -3,9 +3,9 @@
 
 local hand = require( "objects.hand" )
 
-clock = {}
+module = {}
 
-function clock:create(clock_size)
+function module:create(clock_size)
 
     local clock = display.newGroup()
     local circle = display.newCircle(320, 570, clock_size, clock_size)
@@ -46,13 +46,13 @@ function clock:create(clock_size)
         clock:insert(hours)
     end
 
-    clock.hour = hand:create("hand.png", clock_size - 45, 12 * 60 * 60)
+    clock.hour = hand:create(clock_size - 45, 12 * 60 * 60)
     clock:insert(clock.hour)
 
-    clock.minute = hand:create("hand.png", clock_size - 25, 60 * 60)
+    clock.minute = hand:create(clock_size - 25, 60 * 60)
     clock:insert(clock.minute)
 
-    clock.second = hand:create("sec_hand.png", clock_size - 10, 60)
+    clock.second = hand:create(clock_size - 10, 60)
     clock:insert(clock.second)
 
     local circle = display.newCircle(0, 0, 10, 10)
@@ -78,11 +78,11 @@ function clock:create(clock_size)
 
     end
 
-    clock:step();
+    clock:step()
 
     return clock
 
 end
 
 
-return clock
+return module
