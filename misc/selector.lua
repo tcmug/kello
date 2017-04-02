@@ -80,6 +80,11 @@ function module:create(conf)
 
     --local character = display.newSprite( sheet, sequence )
 
+    local sceneGroup = self.view
+    local rect = display.newRect(0, 0, 50, 50)
+    rect:setFillColor( 0.5, 0.5, 0.5 )
+    group:insert(rect)
+
     for key, value in pairs(conf.items) do
 
         local sequence = {
