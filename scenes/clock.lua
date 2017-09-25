@@ -81,14 +81,13 @@ function scene:create( event )
     self.bottom.y = display.contentHeight + 70
 
     transition.to(self.bottom, {
-        y = display.contentHeight - 30,
+        y = display.contentHeight - 70,
         time = 800,
         easing = easing.inOutCubic
     })
 
     self.accumulated = 0
     self.previous = system.getTimer()
-
 
     local t = tabs:new({
         count = 2,
@@ -182,8 +181,8 @@ function scene:show( event )
 
 
         local sheet = graphics.newImageSheet("selector.png", {
-            width = 32,
-            height = 32,
+            width = 128,
+            height = 128,
             numFrames = 4
         })
 

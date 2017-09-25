@@ -73,10 +73,12 @@ function module:create(conf)
     local selX = -(conf.selected - 1) * selWidth
 
     local sheet = graphics.newImageSheet("selector.png", {
-        width = 32,
-        height = 32,
+        width = 128,
+        height = 128,
         numFrames = 4
     })
+
+
 
     --local character = display.newSprite( sheet, sequence )
 
@@ -103,12 +105,41 @@ function module:create(conf)
     end
 
 
-    local rect = display.newRect(-selWidth * 4, 0, selWidth * 3, selHeight);
-    group:insert(rect)
+    local switcher = graphics.newImageSheet("sa.png", {
+        width = 64,
+        height = 64,
+        numFrames = 2
+    })
 
+    local left = {
+        name = "left",
+        frames = { 1 },
+        times = 1,
+        loopCount = 0
+    }
+
+    local right = {
+        name = "right",
+        frames = { 2 },
+        times = 1,
+        loopCount = 0
+    }
+
+    local rect = display.newSprite( switcher, left )
+    rect.x = -display.contentCenterX + 32
+    rect.y = 0
+    rect.width = selWidth
+    rect.height = selHeight
+    group:insert(rect)
     rect:addEventListener("tap", debounce( 100, tap_left))
 
-    local rect = display.newRect(selWidth * 4, 0, selWidth * 3, selHeight);
+    local rect = display.newSprite( switcher, right )
+    rect.x = display.contentCenterX - 32
+    rect.y = 0
+    rect.width = selWidth
+    rect.height = selHeight
+    group:insert(rect)
+
     group:insert(rect)
 
     rect:addEventListener("tap", debounce( 100, tap_right))

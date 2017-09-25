@@ -5,6 +5,13 @@ local hand = require( "objects.hand" )
 
 module = {}
 
+-- Compute the difference in seconds between local time and UTC.
+function get_timezone()
+  local now = os.time()
+  return os.difftime(now, os.time(os.date("!*t", now)))
+end
+
+
 function module:create(clock_size)
 
     local clock = display.newGroup()
@@ -65,17 +72,50 @@ function module:create(clock_size)
     local anim_time = 300
 
     function clock:step()
-        local h, m, s = self:getTime()
-        self.hour:set(h * 60 * 60 + (m * 60), true)
-        self.minute:set(m * 60 + s, true)
-        self.second:set(s, true)
+        if not self.paused then
+            self.time = {
+                tonumber(os.date("%H"):match("0*(%d+)")),
+                tonumber(os.date("%M"):match("0*(%d+)")),
+                tonumber(os.date("%S"):match("0*(%d+)"))
+            }
+            self.seconds = (self.time[1] * 60 * 60) + (self.time[2] * 60) + (self.time[3])
+            self.hour:set(self.seconds, true)
+            self.minute:set(self.seconds, true)
+            self.second:set(self.seconds, true)
+        end
+    end
+
+    function clock:advance(seconds)
+
+        self.seconds = self.seconds + seconds
+--[[    local h = tonumber(os.date("%H"):match("0*(%d+)"))
+        local m = tonumber(os.date("%M"):match("0*(%d+)"))
+        local s = tonumber(os.date("%S"):match("0*(%d+)"))
+
+        local date = os.date("*t")
+        date.hour = 0
+        date.min = 0
+        date.sec = 0
+
+        local h2 = tonumber(os.date("%H", os.time(date)):match("0*(%d+)"))
+        local m2 = tonumber(os.date("%M", os.time(date)):match("0*(%d+)"))
+        local s2 = tonumber(os.date("%S", os.time(date)):match("0*(%d+)"))
+
+        print(h, m, s)
+        print(h2, m2, s2)--]]
+        --print(self.time[1], self.time[2], self.time[3])
+        self.hour:set(self.seconds, false)
+        self.minute:set(self.seconds, false)
+        self.second:set(self.seconds, false)
     end
 
     function clock:getTime()
-        return tonumber(os.date("%H"):match("0*(%d+)")),
-            tonumber(os.date("%M"):match("0*(%d+)")),
-            tonumber(os.date("%S"):match("0*(%d+)"))
-
+        local h = self.seconds
+        local m = self.seconds
+        local s = self.seconds
+        h = math.floor(h / 60 / 60)
+        m = math.floor(m / 60) - (h * 60)
+        return h, m, s
     end
 
     clock:step()

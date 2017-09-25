@@ -9,16 +9,36 @@ function bottom:create()
     local clock_size = 150
     local offset = 0
 
-    group.digital = display.newText(os.date("%H : %M : %S"), 0, -10, "Roboto-Regular.ttf", 17)
+    group.digital = display.newText(os.date("%H : %M : %S"), 0, -20, "Roboto-Regular.ttf", 17)
     group:insert(group.digital)
 
-    group.period = display.newText("", 0, 10, "Roboto-Regular.ttf", 17)
+    group.period = display.newText("", 0, 0, "Roboto-Regular.ttf", 17)
     group:insert(group.period)
+
+    group.month = display.newText("", 0, 20, "Roboto-Regular.ttf", 17)
+    group:insert(group.month)
+
+    local months = {
+        "tammikuu",
+        "helmikuu",
+        "maaliskuu",
+        "huhtikuu",
+        "toukokuu",
+        "kesäkuu",
+        "heinäkuu",
+        "elokuu",
+        "syyskuu",
+        "lokakuu",
+        "marraskuu",
+        "joulukuu"
+    }
 
     function group:step()
 
-        group.digital.text = os.date("%H : %M : %S")
-
+        month = os.date("%m")
+        group.digital.text = os.date("%H : %M : %S");
+        local day = tonumber(os.date("%d"):match("0*(%d+)"))
+        local month = tonumber(os.date("%m"):match("0*(%d+)"))
         local mth = tonumber(os.date("%H"):match("0*(%d+)"))
 
         if (mth >= 22) then
@@ -32,6 +52,8 @@ function bottom:create()
         elseif (mth >= 0) then
             group.period.text = "On yö"
         end
+
+        group.month.text = day .. " " .. months[month] .. 'ta';
 
     end
 

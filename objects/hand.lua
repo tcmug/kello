@@ -45,25 +45,53 @@ function hand:touch( event )
     if event.phase == "began" then
         display.getCurrentStage():setFocus( self, event.id )
         self.isFocus = true
+        self.parent.paused = true
 
-        self.markX = self.x
-        self.markY = self.y
+        local x = event.x - self.parent.x
+        local y = event.y - self.parent.y
+
+        local deg = math.atan2(x, -y) * (180 / math.pi)
+        if (deg < 0) then
+            deg = 360 + deg
+        end
+
+        self.prev_deg = deg
+        -- self.markX = self.x
+        -- self.markY = self.y
 
     elseif self.isFocus then
+
         if event.phase == "moved" then
-            self.x = event.x - event.xStart + self.markX
-            self.y = event.y - event.yStart + self.markY
+            local x = event.x - self.parent.x
+            local y = event.y - self.parent.y
+
+            local deg = math.atan2(x, -y) * (180 / math.pi)
+            if (deg < 0) then
+                deg = 360 + deg
+            end
+
+            local diff = deg - self.prev_deg
+            self.prev_deg = deg
+
+            if (diff > 1 or diff < 1) then
+                self.parent:advance(diff / (360 / self.steps))
+            end
+
+            --self.x = event.x - event.xStart + self.markX
+            --self.y = event.y - event.yStart + self.markY
 
         elseif event.phase == "ended" or event.phase == "cancelled" then
             display.getCurrentStage():setFocus( self, nil )
             self.isFocus = false
+            self.parent.paused = false
+            --[[
             transition.to(self, {
                 x = self.markX,
                 y = self.markY,
                 time = 250,
                 easing = easing.outElastic
             });
-
+            ]]
         end
     end
 
