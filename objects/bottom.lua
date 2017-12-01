@@ -3,12 +3,13 @@
 
 bottom = {}
 
-function bottom:create()
+function bottom:create(clock)
 
     local group = display.newGroup()
     local clock_size = 150
     local offset = 0
 
+    group.clock = clock
     group.digital = display.newText(os.date("%H : %M : %S"), 0, -20, "Roboto-Regular.ttf", 17)
     group:insert(group.digital)
 
@@ -17,6 +18,9 @@ function bottom:create()
 
     group.month = display.newText("", 0, 20, "Roboto-Regular.ttf", 17)
     group:insert(group.month)
+
+    group.extra = display.newText("", 0, 40, "Roboto-Regular.ttf", 17)
+    group:insert(group.extra)
 
     local months = {
         "tammikuu",
@@ -36,7 +40,8 @@ function bottom:create()
     function group:step()
 
         month = os.date("%m")
-        group.digital.text = os.date("%H : %M : %S");
+        h, m, s = group.clock:getTime()
+        group.digital.text = string.format("%02d : %02d : %02d", h, m, s)
         local day = tonumber(os.date("%d"):match("0*(%d+)"))
         local month = tonumber(os.date("%m"):match("0*(%d+)"))
         local mth = tonumber(os.date("%H"):match("0*(%d+)"))
@@ -55,6 +60,13 @@ function bottom:create()
 
         group.month.text = day .. " " .. months[month] .. 'ta';
 
+        if (month == 12) then
+            if (day < 24) then
+                group.extra.text = (24 - day) .. " yötä jouluun!"
+            elseif (day == 24) then
+                group.extra.text = "JOULUAATTO!"
+            end
+        end
     end
 
     group:step()

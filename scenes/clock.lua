@@ -60,7 +60,7 @@ function scene:create( event )
 
     -- top
 
-    self.top = top:create()
+    self.top = top:create(self.clock)
     sceneGroup:insert(self.top)
 
     self.top.x = display.contentCenterX
@@ -68,37 +68,37 @@ function scene:create( event )
 
     transition.to(self.top, {
         y = 30,
-        time = 800,
-        transition = easing.inOutCubic
+        time = 300,
+        easing = easing.outInBack
     })
 
     -- bottom
 
-    self.bottom = bottom:create()
+    self.bottom = bottom:create(self.clock)
     sceneGroup:insert(self.bottom)
 
     self.bottom.x = display.contentCenterX
     self.bottom.y = display.contentHeight + 70
 
     transition.to(self.bottom, {
-        y = display.contentHeight - 70,
-        time = 800,
-        easing = easing.inOutCubic
+        y = display.contentHeight - 50,
+        time = 300,
+        easing = easing.outInBack
     })
 
     self.accumulated = 0
     self.previous = system.getTimer()
 
-    local t = tabs:new({
-        count = 2,
-        tabs = {
-            "scenes.clock",
-            "scenes.settings",
-        }
-    })
+    -- local t = tabs:new({
+    --     count = 2,
+    --     tabs = {
+    --         "scenes.clock",
+    --         "scenes.settings",
+    --     }
+    -- })
 
-    t.x = display.contentCenterX
-    t.y = display.actualContentHeight - 50
+    -- t.x = display.contentCenterX
+    -- t.y = display.actualContentHeight - 50
 
     -- Runtime listeners
     Runtime:addEventListener( "enterFrame", self )

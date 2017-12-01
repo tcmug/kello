@@ -3,18 +3,11 @@
 
 module = {}
 
-function clampRotation(degrees)
-    if (degrees == 0) then
-        return 360
-    end
-    if (degrees >= 360) then
-        return degrees - (math.floor(degrees / 360) * 360)
-    end
-    return degrees
-end
-
 local hand = {}
 
+function clampRotation(degrees)
+    return degrees - (math.floor(degrees / 360) * 360)
+end
 
 function hand:step()
     self.step_value = self.step_value + 1
@@ -29,6 +22,9 @@ function hand:set(value, animate)
         local new_rotation = clampRotation(value * self.step_sz)
         local function trim()
             self.rotation = clampRotation(self.rotation)
+        end
+        if (new_rotation < self.rotation) then
+            new_rotation = new_rotation + 360
         end
         transition.to(self, {
             rotation = new_rotation,
@@ -56,8 +52,6 @@ function hand:touch( event )
         end
 
         self.prev_deg = deg
-        -- self.markX = self.x
-        -- self.markY = self.y
 
     elseif self.isFocus then
 
@@ -73,25 +67,22 @@ function hand:touch( event )
             local diff = deg - self.prev_deg
             self.prev_deg = deg
 
+            if (diff > 300) then
+                diff = diff - 360
+            end
+
+            if (diff < -300) then
+                diff = diff + 360
+            end
+
             if (diff > 1 or diff < 1) then
                 self.parent:advance(diff / (360 / self.steps))
             end
-
-            --self.x = event.x - event.xStart + self.markX
-            --self.y = event.y - event.yStart + self.markY
 
         elseif event.phase == "ended" or event.phase == "cancelled" then
             display.getCurrentStage():setFocus( self, nil )
             self.isFocus = false
             self.parent.paused = false
-            --[[
-            transition.to(self, {
-                x = self.markX,
-                y = self.markY,
-                time = 250,
-                easing = easing.outElastic
-            });
-            ]]
         end
     end
 

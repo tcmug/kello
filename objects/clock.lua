@@ -53,10 +53,10 @@ function module:create(clock_size)
         clock:insert(hours)
     end
 
-    clock.hour = hand:create(clock_size - 45, 12 * 60 * 60)
+    clock.hour = hand:create(clock_size - 35, 12 * 60 * 60)
     clock:insert(clock.hour)
 
-    clock.minute = hand:create(clock_size - 25, 60 * 60)
+    clock.minute = hand:create(clock_size - 20, 60 * 60)
     clock:insert(clock.minute)
 
     clock.second = hand:create(clock_size - 10, 60)
@@ -86,24 +86,7 @@ function module:create(clock_size)
     end
 
     function clock:advance(seconds)
-
         self.seconds = self.seconds + seconds
---[[    local h = tonumber(os.date("%H"):match("0*(%d+)"))
-        local m = tonumber(os.date("%M"):match("0*(%d+)"))
-        local s = tonumber(os.date("%S"):match("0*(%d+)"))
-
-        local date = os.date("*t")
-        date.hour = 0
-        date.min = 0
-        date.sec = 0
-
-        local h2 = tonumber(os.date("%H", os.time(date)):match("0*(%d+)"))
-        local m2 = tonumber(os.date("%M", os.time(date)):match("0*(%d+)"))
-        local s2 = tonumber(os.date("%S", os.time(date)):match("0*(%d+)"))
-
-        print(h, m, s)
-        print(h2, m2, s2)--]]
-        --print(self.time[1], self.time[2], self.time[3])
         self.hour:set(self.seconds, false)
         self.minute:set(self.seconds, false)
         self.second:set(self.seconds, false)
@@ -115,6 +98,9 @@ function module:create(clock_size)
         local s = self.seconds
         h = math.floor(h / 60 / 60)
         m = math.floor(m / 60) - (h * 60)
+        if (s >= 60) then
+            s = math.floor(s - math.floor(s / 60) * 60)
+        end
         return h, m, s
     end
 
